@@ -26,8 +26,8 @@ resource "azurerm_postgresql_server" "pgsql-srv" {
   location            = data.azurerm_resource_group.rg-maalsi.location
   resource_group_name = data.azurerm_resource_group.rg-maalsi.name
 
-  administrator_login          = data.azurerm_key_vault_secret.database-login.value #"psqladmin"
-  administrator_login_password = data.azurerm_key_vault_secret.database-password.value #"H@Sh1CoR3!"
+  administrator_login          = data.azurerm_key_vault_secret.database-login.value 
+  administrator_login_password = data.azurerm_key_vault_secret.database-password.value
   
   sku_name   = "GP_Gen5_4"
   version    = "11"
@@ -42,6 +42,14 @@ resource "azurerm_postgresql_server" "pgsql-srv" {
   ssl_minimal_tls_version_enforced = "TLSEnforcementDisabled"
 
   
+}
+
+resource "azurerm_postgresql_firewall_rule" "example" {
+  name                = "fw-${var.project_name}${var.environment_suffix}"
+  resource_group_name = data.azurerm_resource_group.rg-maalsi.name
+  server_name         = azurerm_postgresql_server.pgsql-srv.name
+  start_ip_address    = "0.0.0.0"
+  end_ip_address      = "0.0.0.0"
 }
 
 #########################
