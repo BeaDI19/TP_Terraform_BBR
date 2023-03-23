@@ -34,10 +34,8 @@ resource "azurerm_postgresql_server" "pgsql-srv" {
   storage_mb = 640000
 
   backup_retention_days        = 7
-  geo_redundant_backup_enabled = true
   auto_grow_enabled            = true
 
-  public_network_access_enabled    = false
   ssl_enforcement_enabled          = false
   ssl_minimal_tls_version_enforced = "TLSEnforcementDisabled"
 
@@ -79,10 +77,10 @@ resource "azurerm_linux_web_app" "web-app" {
   app_settings = {
 	// "DB_USERNAME" = "${data.azurerm_key_vault_secret.db-username.value}@${azurerm_postgresql_server.pgsql-srv.name}"
     PORT=3000
-    DB_HOST=""
-    DB_USERNAME="YOUR_POSTGRES_USERNAME"
-    DB_PASSWORD="YOUR_POSTGRES_PASSWORD"
-    DB_DATABASE="YOUR_POSTGRES_DATABASE"
+    DB_HOST=azurerm_postgresql_server.pgsql-srv.fqdn
+    DB_USERNAME="${data.azurerm_key_vault_secret.database-login.value}@${azurerm_postgresql_server.pgsql-srv.name}"
+    DB_PASSWORD=data.azurerm_key_vault_secret.database-password.value
+    DB_DATABASE="postgres"
     DB_DAILECT="postgres"
     DB_PORT=5432
     ACCESS_TOKEN_SECRET = "YOUR_SECRET_KEY"
